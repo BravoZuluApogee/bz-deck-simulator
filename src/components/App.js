@@ -20,27 +20,24 @@ class App extends Component {
     }
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { cookies } = this.props;
 
     //  Some of this needs to be sequenced, so we'll need to use async/await here
     //  https://www.valentinog.com/blog/await-react/
 
     if ( cookies.get('savedDeck') == null ) {
-      //  Get a new deck 
-      fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6')
-        .then( results => results.json() )
-        .then( results => {
-          cookies.set('savedDeck', results.deck_id )
-        })
+      //  No saved cookie, so lets create a new deck
+      const response = await fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6');
+      const json = await response.json();
+      cookies.set('savedDeck', json.deck_id );
     } else {
-      //  Shuffle the saved deck
+      //  We have a cookies with a deck id, so shuffle it
       const url = "https://deckofcardsapi.com/api/deck/" + cookies.get('savedDeck') + "/shuffle/"
-      fetch(url)
-        .then( results => results.json() )
-        .then( results => {
-          this.setState({ deck: results })
-        })
+
+      const response = await fetch( url );
+      const json = await response.json();
+      this.setState({ deck: json });
     }
 
     //  Now that we have the deck, lets load the cards
