@@ -45,7 +45,17 @@ class App extends Component {
     fetch( urlCards )
       .then( results => results.json() )
       .then( results => {
-        this.setState({ deck: results.cards })
+        //  Trim out some of the extra data
+        const cards = results.cards.map( card => {
+          let newCard = {
+            value: card.value,
+            suit: card.suit,
+            code: card.code
+          }
+          return newCard;
+        });
+
+        this.setState({ deck: cards });
       })
 
     this.setState({ deckId: cookies.get('savedDeck') });
